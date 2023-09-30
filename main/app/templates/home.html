@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <title>TEST_23_09_1</title>
+</head>
+<body>
+    {% include 'nav.html' %}
+    <div class="container">
+        <h1>Django-GCS</h1>
+        <br>
+        <h3>
+            <li>게시물을 작성, 삭제 수정할 수 있다. </li>
+            <li>게시물 작정시 다중이미지를 업로드할 수 있다. </li>
+            <li>이미지는 GSC에 저장, img path url을 postgresql에 저장</li>
+            <li>게시물 READ -> GSC에서 불러옴</li>
+        </h3> 
+    </div>
+
+    {% include 'footer.html' %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+
+
+</body>
+</html>
