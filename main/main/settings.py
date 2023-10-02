@@ -12,8 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os, json
+from django.core.exceptions import ImproperlyConfigured
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 sercret_path = os.path.join(BASE_DIR, ".secret", ".secret.json")
@@ -21,12 +22,14 @@ sercret_path = os.path.join(BASE_DIR, ".secret", ".secret.json")
 with open(sercret_path) as f:
     secrets = json.loads(f.read())
 
-print(secrets)
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+def get_secret(value, secret=secrets):
+    try:
+        return secret[value]
+    except KeyError:
+        error_msg = "{} 설정이 잘못되어 있습니다. {}를 확인해주세요",format(value)
+        raise ImproperlyConfigured(error_msg)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-pd4*!os94gn7cxl3$if8*j0b922o*sfi&jx9k1j^@lb)02g_q%'
+SECRET_KEY = get_secret("SECRET")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -76,14 +79,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'main.wsgi.application'
 
+#GCS connect setting
+DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+GS_BUCKET_NAME = get_secret("GS_BUCKET_NAME")
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': get_secret("DB_NAME"),
+        'USER' : get_secret("DB_USER"),
+        'PASSWORD' : get_secret("DB_PASSWORD"),
+        'PORT' : get_secret("DB_PORT"),
+        'HOST' : get_secret("DB_HOST"),
     }
 }
 
