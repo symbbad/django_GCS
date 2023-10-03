@@ -7,7 +7,7 @@ For more information on this file, see
 https://docs.djangoproject.com/en/4.2/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/4.2/ref/settings/
+https://docs.djandjango.core.exceptions 라이브러리goproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
@@ -17,19 +17,19 @@ from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-sercret_path = os.path.join(BASE_DIR, ".secret", ".secret.json")
+db_sercret_path = os.path.join(BASE_DIR, ".secret", ".secret.json")
 
-with open(sercret_path) as f:
-    secrets = json.loads(f.read())
+with open(db_sercret_path) as f:
+    db_secrets = json.loads(f.read())
 
-def get_secret(value, secret=secrets):
+def get_db_secret(value, secret=db_secrets):
     try:
         return secret[value]
     except KeyError:
-        error_msg = "{} 설정이 잘못되어 있습니다. {}를 확인해주세요",format(value)
+        error_msg = "{} 설정이 잘못되어 있습니다".format(value)
         raise ImproperlyConfigured(error_msg)
 
-SECRET_KEY = get_secret("SECRET")
+SECRET_KEY = get_db_secret("SECRET")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -80,8 +80,27 @@ TEMPLATES = [
 WSGI_APPLICATION = 'main.wsgi.application'
 
 #GCS connect setting
+from google.oauth2 import service_account
+
+gcs_secret_path = os.path.join(BASE_DIR, ".secret", ".gcs.json")
+
+with open(gcs_secret_path) as f:
+    gcs_secrets = json.loads(f.read())
+
+def get_gcs_secret(value, secret=gcs_secrets):
+    try:
+        return secret[value]
+    except KeyError:
+        error_msg = "{} 설정을 확인해주세요".format(value)
+        raise ImproperlyConfigured(error_msg)
+    
 DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-GS_BUCKET_NAME = get_secret("GS_BUCKET_NAME")
+GS_BUCKET_NAME = get_gcs_secret("GS_BUCKET_NAME")
+GS_PROJECT_ID = get_gcs_secret("project_id")
+
+GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
+    gcs_secret_path
+)
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -89,14 +108,13 @@ GS_BUCKET_NAME = get_secret("GS_BUCKET_NAME")
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': get_secret("DB_NAME"),
-        'USER' : get_secret("DB_USER"),
-        'PASSWORD' : get_secret("DB_PASSWORD"),
-        'PORT' : get_secret("DB_PORT"),
-        'HOST' : get_secret("DB_HOST"),
+        'NAME': get_db_secret("DB_NAME"),
+        'USER' : get_db_secret("DB_USER"),
+        'PASSWORD' : get_db_secret("DB_PASSWORD"),
+        'PORT' : get_db_secret("DB_PORT"),
+        'HOST' : get_db_secret("DB_HOST"),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
